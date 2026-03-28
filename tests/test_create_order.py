@@ -18,18 +18,18 @@ class TestCreateOrder:
                         ''')
     def test_create_order_whith_auth(self, create_new_user):
         with allure.step("Получить токен авторизации из фикстуры create_new_user"):
-        token = create_new_user[1].json()["accessToken"]
-        headers = {'Authorization': token}
+            token = create_new_user[1].json()["accessToken"]
+            headers = {'Authorization': token}
     
         with allure.step("Отправить запрос на создание заказа с авторизацией"):
-        response = requests.post(
-            URL.main_url + Endpoints.CREATE_ORDER,
-            headers=headers,
-            data=Ingredients.correct_ingredients_data
-        )
+            response = requests.post(
+                URL.main_url + Endpoints.CREATE_ORDER,
+                headers=headers,
+                data=Ingredients.correct_ingredients_data
+            )
     
         with allure.step("Проверить статус-код и наличие success в ответе"):
-        assert response.status_code == StatusCode.OK and response.json().get("success") == True
+            assert response.status_code == StatusCode.OK and response.json().get("success") == True
 
     @allure.title('Проверка создания заказа без авторизации')
     @allure.description('''
@@ -38,10 +38,10 @@ class TestCreateOrder:
                         ''')
     def test_create_order_without_auth(self):
         with allure.step("Отправить запрос на создание заказа без авторизации"):
-        response = requests.post(
-            URL.main_url + Endpoints.CREATE_ORDER,
-            data=Ingredients.correct_ingredients_data
-        )
+            response = requests.post(
+                URL.main_url + Endpoints.CREATE_ORDER,
+                data=Ingredients.correct_ingredients_data
+            )
     
         with allure.step("Проверить статус-код и наличие success в ответе"):
             assert response.status_code == StatusCode.OK and response.json().get("success") == True
@@ -55,15 +55,15 @@ class TestCreateOrder:
                         ''')
     def test_create_order_without_ingredients(self, create_new_user):
         with allure.step("Получить токен авторизации из фикстуры create_new_user"):
-        token = create_new_user[1].json()["accessToken"]
-        headers = {'Authorization': token}
+            token = create_new_user[1].json()["accessToken"]
+            headers = {'Authorization': token}
     
         with allure.step("Отправить запрос на создание заказа без ингредиентов"):
-        response = requests.post(
-            URL.main_url + Endpoints.CREATE_ORDER,
-            headers=headers,
-            data=Ingredients.incorrect_ingredients_data_without_filling
-        )
+            response = requests.post(
+                URL.main_url + Endpoints.CREATE_ORDER,
+                headers=headers,
+                data=Ingredients.incorrect_ingredients_data_without_filling
+            )
     
         with allure.step("Проверить статус-код BAD_REQUEST и success = False в ответе"):
             assert response.status_code == StatusCode.BAD_REQUEST and response.json().get("success") == False
@@ -77,15 +77,15 @@ class TestCreateOrder:
                         ''')
     def test_create_order_incorrect_hash(self, create_new_user):
         with allure.step("Получить токен авторизации из фикстуры create_new_user"):
-        token = create_new_user[1].json()["accessToken"]
-        headers = {'Authorization': token}
+            token = create_new_user[1].json()["accessToken"]
+            headers = {'Authorization': token}
     
         with allure.step("Отправить запрос на создание заказа с некорректным хэшем ингредиентов"):
-        response = requests.post(
-            URL.main_url + Endpoints.CREATE_ORDER,
-            headers=headers,
-            data=Ingredients.incorrect_ingredients_data_hash
-        )
+            response = requests.post(
+                URL.main_url + Endpoints.CREATE_ORDER,
+                headers=headers,
+                data=Ingredients.incorrect_ingredients_data_hash
+            )
     
         with allure.step("Проверить статус-код INTERNAL_SERVER_ERROR и наличие сообщения об ошибке"):
             assert response.status_code == StatusCode.INTERNAL_SERVER_ERROR
