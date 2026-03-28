@@ -32,7 +32,7 @@ class TestChangeUserData:
                 URL.main_url + Endpoints.DATA_CHANGE,
                 headers=headers,
                 data=data
-        )
+            )
     
         with allure.step("Проверить статус-код OK и success = True"):
             assert response.status_code == StatusCode.OK
