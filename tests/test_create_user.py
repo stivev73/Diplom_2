@@ -17,8 +17,12 @@ class TestCreateUser:
                         3. Удаляем пользователя.
                         ''')
     def test_create_user(self, create_new_user):
+        with allure.step("Получить ответ от фикстуры create_new_user"):
         response = create_new_user
-        assert response[1].json().get("success") == True and response[1].status_code == StatusCode.OK
+    
+        with allure.step("Проверить статус-код и наличие success в ответе"):
+            assert response[1].json().get("success") == True
+            assert response[1].status_code == StatusCode.OK
 
     @allure.title('Проверка создания дублирующего пользователя')
     @allure.description('''
@@ -29,12 +33,19 @@ class TestCreateUser:
                         5. Удаляем пользователя.
                         ''')
     def test_create_double_user(self, create_new_user):
+        with allure.step("Получить данные созданного пользователя из фикстуры"):
         response = create_new_user
         payload = response[0]
-        response_double_register = requests.post(URL.main_url + Endpoints.CREATE_USER, data=payload)
-        assert response_double_register.status_code == StatusCode.FORBIDDEN and (
-            response_double_register.json().get("message") == TextResponse.CREATE_DOUBLE_USER
-            )
+    
+        with allure.step("Отправить запрос на повторное создание того же пользователя"):
+        response_double_register = requests.post(
+            URL.main_url + Endpoints.CREATE_USER,
+            data=payload
+        )
+    
+        with allure.step("Проверить статус-код FORBIDDEN и сообщение об ошибке"):
+            assert response_double_register.status_code == StatusCode.FORBIDDEN
+            assert response_double_register.json().get("message") == TextResponse.CREATE_DOUBLE_USER
 
     @allure.title('Проверка создания некорректного пользователя')
     @allure.description('''
@@ -47,5 +58,19 @@ class TestCreateUser:
         Person.create_data_incorrect_user_without_password()
     ])
     def test_create_user_incorrect_data(self, payload):
-        response = requests.post(URL.main_url + Endpoints.CREATE_USER, data=payload)
-        assert response.status_code == StatusCode.FORBIDDEN and response.json().get("success") == False
+        with allure.step("Подготовка некорректных данных для создания пользователя"):
+        allure.attach(
+            str(payload),
+            "Некорректные данные",
+            allure.attachment_type.TEXT
+        )
+    
+        with allure.step("Отправить запрос на создание пользователя с некорректными данными"):
+        response = requests.post(
+            URL.main_url + Endpoints.CREATE_USER,
+            data=payload
+        )
+    
+        with allure.step("Проверить статус-код FORBIDDEN и success = False"):
+            assert response.status_code == StatusCode.FORBIDDEN
+            assert response.json().get("success") == False
