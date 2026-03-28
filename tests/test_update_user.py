@@ -23,10 +23,20 @@ class TestChangeUserData:
         Person.create_data_correct_user()["email"]
     ])
     def test_change_person_data(self, create_new_user, data):
-        token = create_new_user[1].json()["accessToken"]
-        headers = {'Authorization': token}
-        response = requests.patch(URL.main_url + Endpoints.DATA_CHANGE, headers=headers, data=data)
-        assert response.status_code == StatusCode.OK and response.json().get("success") == True
+        with allure.step("Получить токен авторизации из фикстуры create_new_user"):
+            token = create_new_user[1].json()["accessToken"]
+            headers = {'Authorization': token}
+    
+        with allure.step(f"Отправить запрос на изменение данных пользователя с параметрами: {data}"):
+            response = requests.patch(
+                URL.main_url + Endpoints.DATA_CHANGE,
+                headers=headers,
+                data=data
+        )
+    
+        with allure.step("Проверить статус-код OK и success = True"):
+            assert response.status_code == StatusCode.OK
+            assert response.json().get("success") == True
 
     @allure.title('Проверка изменения данных пользователя без авторизации')
     @allure.description('''
@@ -38,8 +48,20 @@ class TestChangeUserData:
         Person.create_data_correct_user()["password"],
         Person.create_data_correct_user()["email"]
     ])
-    def test_change_person_data_whithout_auth(self, data):
-        response = requests.patch(URL.main_url + Endpoints.DATA_CHANGE, data=data)
-        assert response.status_code == StatusCode.UNAUTHORIZED and (
-            response.json().get("message") == TextResponse.UNAUTHORIZED
+    def test_change_person_data_without_auth(self, data):  # Исправлено: whithout -> without
+        with allure.step(f"Подготовить данные для изменения: {data}"):
+            allure.attach(
+                str(data),
+                "Данные для обновления",
+                allure.attachment_type.TEXT    
             )
+    
+        with allure.step("Отправить запрос на изменение данных без авторизации"):
+            response = requests.patch(
+                URL.main_url + Endpoints.DATA_CHANGE,
+                data=data
+            )
+    
+        with allure.step("Проверить статус-код UNAUTHORIZED и сообщение об ошибке"):
+            assert response.status_code == StatusCode.UNAUTHORIZED
+            assert response.json().get("message") == TextResponse.UNAUTHORIZED
